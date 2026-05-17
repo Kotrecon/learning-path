@@ -84,4 +84,4 @@
 - [theory.md](theory.md) — теория модуля
 - [task.md](task.md) — практика по дням
 - [README.md](../README.md) — план Фазы 1
-- [PROGRESS.md](../../../PROGRESS.md) — таблица прогресса
+- [PROGRESS.md](../../PROGRESS.md) — таблица прогресса
