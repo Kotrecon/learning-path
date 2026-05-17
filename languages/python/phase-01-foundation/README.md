@@ -91,12 +91,12 @@
 
 ### 📅 День 1: `match/case`, структурное сопоставление, guards
 
-| Этап           | Время  | Действие                                                                                                                                                                                                          |
-| -------------- | ------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| 📖 Теория      | 15 мин | Прочитать: [Structural Pattern Matching](https://docs.python.org/3/reference/compound_stmts.html#match). Понять: `match` работает с типами, кортежами, литералами. `case _` = default. `if` после `case` = guard. |
-| 💻 Практика    | 25 мин | Создать `module2/match_basics.py`: ```python<br>def parse_response(status: int, data: dict):<br> match status:<br> case 200: return data<br> case 400                                                             | 422: raise ValueError(f"Bad input: {data}")<br> case 500 if "retry" in data: return "retry"<br> case \_: raise RuntimeError("Unknown")``` |
-| 🔍 Инструменты | 15 мин | **VS Code Debugger**: пошагово пройти `match`. Проверить: `case _` ловит всё, guard срабатывает только при условии.                                                                                               |
-| 📝 Фиксация    | 5 мин  | Коммит: `feat(module2): implement match/case parsing`. Записать: `match` ≠ `switch`, он проверяет структуру, не только значение.                                                                                  |
+| Этап           | Время  | Действие                                                                                                                                                                                                                                                                 |
+| -------------- | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 📖 Теория      | 15 мин | Прочитать: `[Structural Pattern Matching](https://docs.python.org/3/reference/compound_stmts.html#match)`. Понять: `match` работает с типами, кортежами, литералами. `case _` = default. `if` после `case` = guard.                                                      |
+| 💻 Практика    | 25 мин | Создать `module2/match_basics.py: python def parse_response(status: int, data: dict):  match status:  case 200: return data  case 400 case 422: raise ValueError(f"Bad input: {data}")  case 500 if "retry" in data: return "retry" case: raise RuntimeError("Unknown")` |
+| 🔍 Инструменты | 15 мин | **VS Code Debugger**: пошагово пройти `match`. Проверить: `case _` ловит всё, guard срабатывает только при условии.                                                                                                                                                      |
+| 📝 Фиксация    | 5 мин  | Коммит: `feat(module2): implement match/case parsing`. Записать: `match` ≠ `switch`, он проверяет структуру, не только значение.                                                                                                                                         |
 
 📦 **Артефакт дня:** `match_basics.py`, скриншот отладки.
 
