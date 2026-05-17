@@ -1,0 +1,47 @@
+# ОС
+.DS_Store
+Thumbs.db
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+ENV/
+env/
+*.egg-info/
+dist/
+build/
+*.egg
+
+# uv
+uv.lock！
+# uv.lock КОМИТИТСЯ (не игнорируем), но .venv/ игнорируем
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Scripts
+*.ps1.log
+*.log
+
+# Тесты и артефакты
+.coverage
+htmlcov/
+.pytest_cache/
+.mypy_cache/
+.deptry/
+
+# Секреты
+.env
+.env.local
+.env.*.local
+*.key
+*.pem
