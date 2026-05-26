@@ -1,1 +1,5 @@
-﻿Console.WriteLine("Hello .NET 10");
+﻿using Microsoft.Extensions.Hosting;
+
+var host = Host.CreateDefaultBuilder(args).Build();
+
+await host.RunAsync();
