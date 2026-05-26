@@ -10,13 +10,12 @@
 
 - **Статус:** ✅ Completed
 - **Дата выполнения:** 2026-05-26
-- **Коммит:** `feat(module1): migrate to top-level statements`
+- **Коммит:** `f46a814` | `feat(module1): migrate to top-level statements`
 - **Заметки/Наблюдения:**
   - Проект создан через `dotnet new console -n ConsoleStarter -f net10.0`
   - `Program.cs` содержит только `Console.WriteLine("Hello .NET 10");`
-  - Компилятор Roslyn автоматически сгенерировал точку входа — проверка через `dotnet build` успешна
-  - Вывод `dotnet run`: `Hello .NET 10`
-  - 💡 Инсайт: Top-level statements — синтаксический сахар, не влияет на сгенерированный IL
+  - Компилятор Roslyn автоматически сгенерировал точку входа
+  - 💡 Инсайт: Top-level statements — синтаксический сахар, сгенерированный IL бинарно идентичен классике
 
 ---
 
