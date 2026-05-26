@@ -38,6 +38,17 @@ for (int i = 1; i <= 3; i++)
     // Обратите внимание: НЕТ using, НЕТ ручного Dispose
 }
 
+Console.WriteLine("\n=== Интеграционный тест ===");
+var factory = host.Services.GetRequiredService<IServiceScopeFactory>();
+
+for (int i = 1; i <= 5; i++)
+{
+    using var scope = factory.CreateScope();
+    var proc = scope.ServiceProvider.GetRequiredService<IDataProcessor>();
+    proc.Process($"Цикл #{i}");
+}
+Console.WriteLine("Тест завершён");
+
 // Запуск хоста
 await host.RunAsync();
 
