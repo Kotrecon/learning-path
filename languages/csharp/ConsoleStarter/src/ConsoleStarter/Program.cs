@@ -1,17 +1,22 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using ConsoleStarter.Services;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-var host = Host.CreateDefaultBuilder(args).Build();
-
+// Создаём билдер
+var builder = Host.CreateApplicationBuilder(args);
 
 // Регистрация сервисов
 builder.Services.AddSingleton<ILoggerService, ConsoleLogger>();
-builder.Services.AddTransient<IDataProcessor, DataProcessor>();
+builder.Services.AddScoped<IDataProcessor, DataProcessor>();
 
-// Пример для Singleton/Transient
+// Строим хост
+var host = builder.Build();
+
+// Проверка резолва
+Console.WriteLine("\n=== Проверка резолва ===");
 var logger = host.Services.GetRequiredService<ILoggerService>();
-// Пример для Scoped — только через скоуп!
-using var scope = host.Services.GetRequiredService<IServiceScopeFactory>().CreateScope();
-var processor = scope.ServiceProvider.GetRequiredService<IDataProcessor>();
+logger.Log("Тест Singleton-резолва");
 
+// Запуск хоста
 await host.RunAsync();
+
