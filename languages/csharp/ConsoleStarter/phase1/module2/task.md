@@ -8,14 +8,16 @@
 
 ### Задача 2.1: Зарегистрировать сервисы с разными стратегиями жизненного цикла
 
-**Описание:** Изучить различия между AddSingleton, AddTransient и AddScoped. Зарегистрировать тестовые сервисы в контейнере через ConfigureServices. Убедиться, что сервисы успешно резолвятся через хост.
+**Описание:** Изучить различия между AddSingleton, AddTransient и AddScoped. Зарегистрировать тестовые сервисы в контейнере через прямой доступ к `builder.Services` (паттерн `HostApplicationBuilder`). Убедиться, что сервисы успешно резолвятся через хост.
 
 **Способы достижения:**
 
-- Создать интерфейсы и реализации: ILogger/ConsoleLogger, IProcessor/DataProcessor
-- В Program.cs добавить регистрацию: `builder.Services.AddSingleton<ILogger, ConsoleLogger>()` и аналоги
-- Резолвить сервисы: `host.Services.GetRequiredService<ILogger>()` и проверить создание экземпляра
-- Закоммитить: `git add . && git commit -m "feat(module2): implement basic DI registration"`
+- Создать интерфейсы и реализации: `ILoggerService`/`ConsoleLogger`, `IDataProcessor`/`DataProcessor`
+- В `Program.cs` добавить регистрацию: `builder.Services.AddSingleton<ILoggerService, ConsoleLogger>()` и аналоги
+- Резолвить сервисы: `host.Services.GetRequiredService<ILoggerService>()` и проверить создание экземпляра
+- Закоммитить:
+  `git add .`
+  `git commit -m "feat(module2): implement basic DI registration"`
 
 **Результат:** Код регистрации в Program.cs, успешный резолв всех сервисов, коммит с DI-настройкой в репозитории.
 
@@ -78,6 +80,8 @@
 
 **Описание:** Использовать dotnet-counters для наблюдения за размером GC-кучи в реальном времени. Запустить приложение, создать несколько скоупов, убедиться, что память освобождается после завершения скоупов.
 
+> ⚠️ Если инструмент не установлен: `dotnet tool install -g dotnet-counters`
+
 **Способы достижения:**
 
 - Запустить приложение в одном окне: `dotnet run`
@@ -106,9 +110,9 @@
 
 ✅ **Критерий приёмки:**
 
-- Сервисы зарегистрированы через ConfigureServices с указанием жизненного цикла
-- IServiceScopeFactory используется для создания скоупов в консольном приложении
-- IDisposable.Dispose() вызывается контейнером для Singleton при остановке хоста и для Scoped при завершении скоупа
-- dotnet-counters подтверждает отсутствие утечек памяти
-- module2/README.md содержит примеры кода и инструкции по проверке
+- Сервисы зарегистрированы через `builder.Services` с явным указанием жизненного цикла
+- `IServiceScopeFactory` используется для создания скоупов в консольном приложении
+- `IDisposable.Dispose()` вызывается контейнером для `Singleton` при остановке хоста и для `Scoped` при завершении скоупа
+- `dotnet-counters` подтверждает отсутствие утечек памяти
+- `module2/README.md` содержит примеры кода и инструкции по проверке
 - Все изменения зафиксированы в Git с понятной историей коммитов
