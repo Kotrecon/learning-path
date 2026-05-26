@@ -17,6 +17,18 @@ Console.WriteLine("\n=== Проверка резолва ===");
 var logger = host.Services.GetRequiredService<ILoggerService>();
 logger.Log("Тест Singleton-резолва");
 
+Console.WriteLine("\n=== Тест Scoped lifecycle ===");
+var scopeFactory = host.Services.GetRequiredService<IServiceScopeFactory>();
+
+for (int i = 1; i <= 3; i++)
+{
+    Console.WriteLine($"\n--- Итерация {i} ---");
+    using var scope = scopeFactory.CreateScope();
+    var processor = scope.ServiceProvider.GetRequiredService<IDataProcessor>();
+    processor.Process($"Данные #{i}");
+}
+
+
 // Запуск хоста
 await host.RunAsync();
 
