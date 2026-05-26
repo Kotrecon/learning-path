@@ -1,0 +1,3 @@
+﻿[dotnet-counters output]
+dotnet.gc.heap.total_allocated: 6,556,656
+dotnet.gc.last_collection.heap.size (all gen): 0

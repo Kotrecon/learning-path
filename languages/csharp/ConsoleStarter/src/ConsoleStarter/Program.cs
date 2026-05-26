@@ -35,7 +35,7 @@ for (int i = 1; i <= 3; i++)
     Console.WriteLine($"\n--- Transient #{i} ---");
     var ephemeral = host.Services.GetRequiredService<ITransientService>();
     ephemeral.DoWork($"Операция #{i}");
-    // Обратите внимание: НЕТ using, НЕТ ручного Dispose
+
 }
 
 Console.WriteLine("\n=== Интеграционный тест ===");
