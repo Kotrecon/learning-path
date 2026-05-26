@@ -1,0 +1,12 @@
+=== Проверка резолва ===
+[ConsoleLogger] Создан: a987b9d8
+[ConsoleLogger] Создан: a987b9d8 | Тест Singleton-резолва
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Production
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: E:\projects\products\learning-path\languages\csharp\ConsoleStarter\src\ConsoleStarter
+info: Microsoft.Hosting.Lifetime[0]
+      Application is shutting down...
+[ConsoleLogger] Освобождён: a987b9d8
