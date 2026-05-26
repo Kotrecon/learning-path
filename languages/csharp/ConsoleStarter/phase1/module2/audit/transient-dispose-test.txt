@@ -1,0 +1,46 @@
+﻿=== Проверка резолва ===
+[ConsoleLogger] Создан: 1e536eba
+[ConsoleLogger] Создан: 1e536eba | Тест Singleton-резолва
+
+=== Тест Scoped lifecycle ===
+
+--- Итерация 1 ---
+[DataProcessor] Создан: f008ebfa
+[DataProcessor] Работа: f008ebfa | Данные #1
+[DataProcessor] Освобождён: f008ebfa
+
+--- Итерация 2 ---
+[DataProcessor] Создан: 577ba96a
+[DataProcessor] Работа: 577ba96a | Данные #2
+[DataProcessor] Освобождён: 577ba96a
+
+--- Итерация 3 ---
+[DataProcessor] Создан: 022965e8
+[DataProcessor] Работа: 022965e8 | Данные #3
+[DataProcessor] Освобождён: 022965e8
+
+=== Тест Transient lifecycle ===
+
+--- Transient #1 ---
+[EphemeralService] Создан: 27e7ce47
+[EphemeralService] Работа: 27e7ce47 | Операция #1
+
+--- Transient #2 ---
+[EphemeralService] Создан: e34eddd9
+[EphemeralService] Работа: e34eddd9 | Операция #2
+
+--- Transient #3 ---
+[EphemeralService] Создан: bc2d9ab6
+[EphemeralService] Работа: bc2d9ab6 | Операция #3
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Production
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: E:\projects\products\learning-path\languages\csharp\ConsoleStarter
+info: Microsoft.Hosting.Lifetime[0]  
+      Application is shutting down...
+[EphemeralService] Освобождён: bc2d9ab6
+[EphemeralService] Освобождён: e34eddd9
+[EphemeralService] Освобождён: 27e7ce47
+[ConsoleLogger] Освобождён: 1e536eba   .
