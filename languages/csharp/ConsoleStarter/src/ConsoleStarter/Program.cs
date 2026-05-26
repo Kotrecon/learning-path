@@ -8,6 +8,7 @@ var builder = Host.CreateApplicationBuilder(args);
 // Регистрация сервисов
 builder.Services.AddSingleton<ILoggerService, ConsoleLogger>();
 builder.Services.AddScoped<IDataProcessor, DataProcessor>();
+builder.Services.AddTransient<ITransientService, EphemeralService>();
 
 // Строим хост
 var host = builder.Build();
@@ -28,6 +29,14 @@ for (int i = 1; i <= 3; i++)
     processor.Process($"Данные #{i}");
 }
 
+Console.WriteLine("\n=== Тест Transient lifecycle ===");
+for (int i = 1; i <= 3; i++)
+{
+    Console.WriteLine($"\n--- Transient #{i} ---");
+    var ephemeral = host.Services.GetRequiredService<ITransientService>();
+    ephemeral.DoWork($"Операция #{i}");
+    // Обратите внимание: НЕТ using, НЕТ ручного Dispose
+}
 
 // Запуск хоста
 await host.RunAsync();
