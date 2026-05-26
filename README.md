@@ -4,12 +4,12 @@
 
 ## 📚 Языки и курсы
 
-| Язык                                              | План курса                                                 | Прогресс                                            |
-| ------------------------------------------------- | ---------------------------------------------------------- | --------------------------------------------------- |
-| [Python](languages/python/README.md)              | [Фаза 1](languages/python/phase-01-foundation/README.md)   | [Progress](languages/python/PROGRESS.md)            |
-| HTML                                              | —                                                          | —                                                   |
-| JavaScript                                        | —                                                          | —                                                   |
-| [.NET](languages/csharp/ConsoleStarter/README.md) | [Фаза 1](languages/csharp/ConsoleStarter/phase1/README.md) | [Progress](languages/csharp/ConsoleStarter/phase1/) |
+| Язык                                              | План курса                                                 | Прогресс                                                       |
+| ------------------------------------------------- | ---------------------------------------------------------- | -------------------------------------------------------------- |
+| [Python](languages/python/README.md)              | [Фаза 1](languages/python/phase-01-foundation/README.md)   | [Progress](languages/python/PROGRESS.md)                       |
+| HTML                                              | —                                                          | —                                                              |
+| JavaScript                                        | —                                                          | —                                                              |
+| [.NET](languages/csharp/ConsoleStarter/README.md) | [Фаза 1](languages/csharp/ConsoleStarter/phase1/README.md) | [Progress](languages/csharp/ConsoleStarter/phase1/PROGRESS.md) |
 
 ## 🛠️ Инструменты
 
