@@ -1,4 +1,6 @@
 ﻿using ConsoleStarter;
+using ConsoleStarter.Services;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
@@ -8,6 +10,12 @@ using Microsoft.Extensions.Options;
 // ============================================================================
 
 var builder = Host.CreateApplicationBuilder(args);
+
+// Явно добавляем JSON с поддержкой перезагрузки
+// Это перекроет дефолтный провайдер и включит отслеживание изменений файла
+// При reloadOnChange: false (умолчанию) данная команда не требуется
+builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+
 
 // ----------------------------------------------------------------------------
 // 3.1: Базовое чтение из appsettings.json (через IConfiguration)
@@ -31,6 +39,8 @@ Console.WriteLine($"Timeout: {builder.Configuration["App:Timeout"]} (Type: strin
 // ----------------------------------------------------------------------------
 builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("App"));
 
+builder.Services.AddSingleton<ConfigMonitorService>();
+
 var host = builder.Build();
 
 var settings = host.Services.GetRequiredService<IOptions<AppSettings>>().Value;
@@ -38,10 +48,19 @@ Console.WriteLine("\n=== Config: IOptions<T> Binding ===");
 Console.WriteLine($"Name: {settings.Name} (Type: {settings.Name.GetType().Name})");
 Console.WriteLine($"Timeout: {settings.Timeout} (Type: {settings.Timeout.GetType().Name})");
 
+// === Модуль 4.1: Реактивный доступ через IOptionsMonitor ===
+var monitorService = host.Services.GetRequiredService<ConfigMonitorService>();
+monitorService.PrintCurrentConfig(); // Покажет актуальное значение (при старте или после изменения)
+
+// === Запуск хоста ===
+// Для продакшена: ждём сигнал остановки (Ctrl+C)
+
 // ----------------------------------------------------------------------------
 // Запуск/остановка хоста
 // Для тестов: StartAsync + StopAsync (процесс завершается сам)
 // Для прода:   await host.RunAsync() (ждёт Ctrl+C / SIGTERM)
 // ----------------------------------------------------------------------------
-await host.StartAsync();
-await host.StopAsync();
+// await host.StartAsync();
+// await host.StopAsync();
+
+await host.RunAsync();
