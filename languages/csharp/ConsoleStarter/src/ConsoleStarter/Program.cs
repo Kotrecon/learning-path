@@ -10,4 +10,8 @@ Console.WriteLine($"Name: {builder.Configuration["App:Name"]}");
 Console.WriteLine($"Timeout: {builder.Configuration["App:Timeout"]}");
 
 var host = builder.Build();
-await host.RunAsync();
+
+//await host.RunAsync();
+// RunAsync() ждёт Ctrl+C. Для теста конфига используем Start+Stop, чтобы процесс завершился сам.
+await host.StartAsync();
+await host.StopAsync();
