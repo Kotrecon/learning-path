@@ -23,7 +23,12 @@
 - Создать `appsettings.json`: `{ "App": { "Name": "MyApp", "Timeout": 30 } }`
 - В Program.cs получить конфиг: `var config = host.Services.GetRequiredService<IConfiguration>()`
 - Вывести значение: `Console.WriteLine(config["App:Name"])` и проверить вывод "MyApp"
-- Закоммитить: `git add . && git commit -m "feat(module3): add appsettings.json provider"`
+- Закоммитить:
+
+  ```bash
+  git add .
+  git commit -m "feat(module3): add appsettings.json provider"
+  ```
 
 **Результат:** Файл appsettings.json, вывод консоли со значением из конфига, коммит с настройкой JSON-провайдера в репозитории.
 
@@ -33,14 +38,19 @@
 
 ### Задача 3.2: Реализовать приоритет ENV-переменных над JSON
 
-**Описание:** Научиться использовать переменные окружения с разделителем "\_\_" для переопределения вложенных ключей конфигурации. Проверить, что значение из ENV имеет приоритет над JSON без изменения кода.
+**Описание:** Научиться использовать переменные окружения с разделителем `__` для переопределения вложенных ключей конфигурации. Проверить, что значение из ENV имеет приоритет над JSON без изменения кода.
 
 **Способы достижения:**
 
 - В PowerShell установить: `$env:App__Timeout="120"`
 - Запустить `dotnet run` и убедиться, что выводится "120", а не "30" из JSON
 - Проверить порядок провайдеров через `config.GetChildren()` или отладчик
-- Закоммитить: `git commit -am "feat(module3): add Environment Variables provider"`
+- Закоммитить:
+
+  ```bash
+  git add .
+  git commit -m "feat(module3): add Environment Variables provider"
+  ```
 
 **Результат:** Вывод приложения с переопределённым значением из ENV, подтверждение приоритета провайдеров, коммит в истории репозитория.
 
@@ -57,7 +67,12 @@
 - Задать значение в JSON (30), ENV (120) и запустить с `--App:Timeout=300`
 - Убедиться, что приложение выводит "300" — значение из CLI
 - Создать таблицу тестовых комбинаций в `audit/cli-precedence-test.md`
-- Закоммитить: `git commit -am "feat(module3): verify CLI argument priority"`
+- Закоммитить:
+
+  ```bash
+  git add .
+  git commit -m "feat(module3): verify CLI argument priority"
+  ```
 
 **Результат:** Таблица результатов тестов приоритета, подтверждение победы CLI-значения, коммит с верификацией в репозитории.
 
@@ -71,10 +86,15 @@
 
 **Способы достижения:**
 
-- Создать `test-config-precedence.ps1`: в начало скрипта добавить: `[Console]::OutputEncoding = [System.Text.Encoding]::UTF8`, установить ENV, запустить с `--args`, сравнить вывод
+- Создать `test-config-precedence.ps1`: в начало скрипта добавить `[Console]::OutputEncoding = [System.Text.Encoding]::UTF8`, установить ENV, запустить с `--args`, сравнить вывод
 - Добавить проверки для всех комбинаций: только JSON, JSON+ENV, JSON+ENV+CLI
 - Вернуть код выхода 0 при успешном прохождении всех тестов
-- Закоммитить скрипт: `git add . && git commit -m "feat(module3): automate precedence verification"`
+- Закоммитить скрипт:
+
+  ```bash
+  git add .
+  git commit -m "feat(module3): automate precedence verification"
+  ```
 
 **Результат:** Рабочий скрипт test-config-precedence.ps1, вывод "All precedence tests passed", коммит с автоматизацией в репозитории.
 
@@ -84,6 +104,8 @@
 
 ### Задача 3.5: Настроить биндинг конфигурации в типизированный объект
 
+> ⚠️ **Важная оговорка:** `IOptions<T>.Value` кэшируется при первом запросе, а не при старте хоста. Изменения в `appsettings.json` после первого резолва не подхватываются. Для hot-reload нужен `IOptionsMonitor<T>`.
+
 **Описание:** Создать record AppSettings с свойствами Name и Timeout. Настроить биндинг секции "App" через Configure<T>. Резолвить IOptions<AppSettings> и вывести типизированные значения.
 
 **Способы достижения:**
@@ -91,7 +113,12 @@
 - Создать `AppSettings.cs`: `public record AppSettings { public string Name { get; init; } public int Timeout { get; init; } }`
 - В Program.cs добавить: `builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("App"))`
 - Резолвить и вывести: `var settings = host.Services.GetRequiredService<IOptions<AppSettings>>().Value`
-- Закоммитить: `git commit -am "feat(module3): add IOptions<T> binding"`
+- Закоммитить:
+
+  ```bash
+  git add .
+  git commit -m "feat(module3): add IOptions<T> binding"
+  ```
 
 **Результат:** Класс AppSettings.cs, успешный биндинг значений из конфига, коммит с типизированным доступом в репозитории.
 
@@ -112,12 +139,18 @@
 
 **Результат:** Документированный модуль в README.md, открыт PR с меткой "Модуль 3 завершён", скрипт приоритетов проходит, все критерии подтверждены.
 
+---
+
 ✅ **Критерий приёмки:**
 
-- `Program.cs` использует `Host.CreateApplicationBuilder(args)` (современный паттерн .NET 8/10)
-- `appsettings.json` читается через `IConfiguration` с разделителем `:`
-- Переменная окружения `App__Timeout` (с `__`) переопределяет значение из JSON
-- Аргумент командной строки `--App:Timeout=300` имеет наивысший приоритет
-- Скрипт `Scripts/test-config-precedence.ps1` автоматизирует проверку и возвращает код `0`
-- `IOptions<AppSettings>` корректно биндит значения из конфигурации
-- Все изменения зафиксированы в Git с понятной историей коммитов (команды без `&&`)
+| Критерий | Ожидаемое поведение                                                                           |
+| -------- | --------------------------------------------------------------------------------------------- |
+| Билдер   | `Program.cs` использует `Host.CreateApplicationBuilder(args)` (современный паттерн .NET 8/10) |
+| JSON     | `appsettings.json` читается через `IConfiguration` с разделителем `:`                         |
+| ENV      | Переменная окружения `App__Timeout` (с `__`) переопределяет значение из JSON                  |
+| CLI      | Аргумент командной строки `--App:Timeout=300` имеет наивысший приоритет                       |
+| Скрипт   | `test-config-precedence.ps1` автоматизирует проверку и возвращает код `0`                     |
+| IOptions | `IOptions<AppSettings>` корректно биндит значения из конфигурации                             |
+| Git      | Все изменения зафиксированы в Git с понятной историей коммитов                                |
+
+---
