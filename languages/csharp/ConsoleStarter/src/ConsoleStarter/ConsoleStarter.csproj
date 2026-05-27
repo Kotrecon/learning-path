@@ -10,5 +10,12 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.8" />
   </ItemGroup>
-
+<ItemGroup>
+    <!-- Другие элементы могут быть здесь -->
+    
+    <None Update="appsettings.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    
+</ItemGroup>
 </Project>

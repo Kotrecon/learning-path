@@ -60,14 +60,14 @@
 
 ### 📘 Фаза 1: Фундамент .NET 10 и архитектура (Модули 1-6)
 
-| №   | Модуль                                 | Эволюция                                                       | Ключевые навыки                                           | Практика (C# .NET 10)                                    |
-| --- | -------------------------------------- | -------------------------------------------------------------- | --------------------------------------------------------- | -------------------------------------------------------- |
-| 1   | `.NET 10 Console Modernization`        | `static Main` → top-level, `IHost`, minimal boilerplate        | `host routing`, `lifecycle sync`, `startup logic`         | Создать `Program.cs` с `Host.CreateDefaultBuilder()`     |
-| 2   | `DI & Lifetime Management`             | `new` → `AddSingleton/Transient/Scoped`, disposal sync         | `di routing`, `lifetime sync`, `dispose logic`            | Зарегистрировать сервисы, проверить `IDisposable`        |
-| 3   | `Configuration Pipeline`               | `.config` → `appsettings.json`, env vars, CLI args             | `config routing`, `precedence sync`, `parse logic`        | Настроить приоритеты: CLI > ENV > JSON                   |
-| 4   | 🔁 `Options & Runtime Reconfiguration` | `IOptions<T>` → `IOptionsMonitor<T>`, `OnChange`, hot-reload   | `options routing`, `reload sync`, `validate logic`        | Подписаться на изменения конфига, применять без рестарта |
-| 5   | 🔄 `BackgroundService & Cancellation`  | `while(true)` → `ExecuteAsync`, `stoppingToken`, graceful stop | `worker routing`, `cancel sync`, `lifecycle logic`        | Реализовать фоновый воркер с корректной отменой          |
-| 6   | `Baseline Console Pipeline`            | Init → config → DI → host run → cancellation → log             | `orchestration design`, `state propagation`, `sync logic` | Собрать baseline, parity-тест запуска                    |
+| №   | Модуль                                 | Эволюция                                                                              | Ключевые навыки                                           | Практика (C# .NET 10)                                                              |
+| --- | -------------------------------------- | ------------------------------------------------------------------------------------- | --------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| 1   | `.NET 10 Console Modernization`        | `static Main` → top-level, `Host.CreateApplicationBuilder(args)`, minimal boilerplate | `host routing`, `lifecycle sync`, `startup logic`         | Создать `Program.cs` с `Host.CreateApplicationBuilder(args)`, top-level statements |
+| 2   | `DI & Lifetime Management`             | `new` → `AddSingleton/Transient/Scoped`, explicit scopes via `IServiceScopeFactory`   | `di routing`, `lifetime sync`, `dispose logic`            | Зарегистрировать сервисы, проверить `IDisposable`, создать scope вручную в цикле   |
+| 3   | `Configuration Pipeline`               | `.config` → `appsettings.json`, env vars (`__` separator), CLI args                   | `config routing`, `precedence sync`, `parse logic`        | Настроить приоритеты: CLI > ENV (`__`) > JSON, автоматизировать проверку           |
+| 4   | 🔁 `Options & Runtime Reconfiguration` | `IOptions<T>` → `IOptionsMonitor<T>`, `OnChange`, hot-reload, `ValidateOnStart`       | `options routing`, `reload sync`, `validate logic`        | Подписаться на `OnChange`, применить hot-reload, добавить `ValidateOnStart()`      |
+| 5   | 🔄 `BackgroundService & Cancellation`  | `while(true)` → `ExecuteAsync`, cooperative `CancellationToken`                       | `worker routing`, `cancel sync`, `lifecycle logic`        | Реализовать воркер с корректной отменой, написать TUnit-тест завершения            |
+| 6   | `Baseline Console Pipeline`            | Init → config → DI → `CreateApplicationBuilder` → run → cancellation → log → publish  | `orchestration design`, `state propagation`, `sync logic` | Собрать baseline, провести parity-тест на TUnit, подготовить `dotnet publish`      |
 
 ### 🔍 Фаза 2: Логирование и Observability (OTel) (Модули 7-13)
 
