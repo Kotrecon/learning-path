@@ -34,8 +34,7 @@
 ## Модуль 5 — 🔄 BackgroundService & Cancellation
 
 - **Статус:** ✅ Completed
-- **PR:** ⏳ Готовится к созданию
+- **PR:** [#5](https://github.com/Kotrecon/learning-path/pull/5)
 - **Коммит:** `feat: complete Module 5 — BackgroundService & Cancellation`
-- **Артефакты:** `src/ConsoleStarter/Services/PipelineWorker.cs`, `src/ConsoleStarter/Program.cs`, `phase1/module5/README.md`
 
 > 📝 Правила: Статус меняется только после мержа PR. В заметки — только технические инсайты.
