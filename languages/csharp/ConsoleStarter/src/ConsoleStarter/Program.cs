@@ -55,6 +55,30 @@ Console.WriteLine($"Timeout: {settings.Timeout} (Type: {settings.Timeout.GetType
 var monitorService = host.Services.GetRequiredService<ConfigMonitorService>();
 monitorService.PrintCurrentConfig();
 
+// === Демонстрация IOptionsSnapshot<T> ===
+Console.WriteLine("\n=== Config: IOptionsSnapshot<T> (Per-Scope) ===");
+Console.WriteLine("[Scope 1] Reading config...");
+using (var scope1 = host.Services.CreateScope())
+{
+    var snap1 = scope1.ServiceProvider.GetRequiredService<IOptionsSnapshot<AppSettings>>();
+    Console.WriteLine($"[Scope 1] Timeout: {snap1.Value.Timeout} (frozen for this scope)");
+}
+
+Console.WriteLine("\n💡 Измени appsettings.json сейчас, если хочешь проверить обновление между скоупами.");
+Console.WriteLine("⏳ Ждём 20 секунд...");
+await Task.Delay(20000);
+
+using (var scope2 = host.Services.CreateScope())
+{
+    var snap2 = scope2.ServiceProvider.GetRequiredService<IOptionsSnapshot<AppSettings>>();
+    Console.WriteLine($"[Scope 2] Timeout: {snap2.Value.Timeout} (new snapshot)");
+}
+// =====================================
+
+await host.RunAsync();
+
+
+
 // ----------------------------------------------------------------------------
 // Запуск хоста: ждём сигнал остановки (Ctrl+C)
 // ----------------------------------------------------------------------------
