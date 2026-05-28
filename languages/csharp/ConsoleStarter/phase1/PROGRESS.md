@@ -37,4 +37,11 @@
 - **PR:** [#5](https://github.com/Kotrecon/learning-path/pull/5)
 - **Коммит:** `feat: complete Module 5 — BackgroundService & Cancellation`
 
+## Модуль 6 — 🎯 Baseline Console Pipeline
+
+- **Статус:** ✅ Completed
+- **PR:** ⏳ Готовится к созданию
+- **Коммит:** `feat: complete Module 6 — Baseline Console Pipeline`
+- **Артефакты:** `src/ConsoleStarter/Program.cs`, `src/ConsoleStarter/Services/PipelineWorker.cs`, `tests/ConsoleStarter.Tests/ParityTests.cs`, `phase1/module6/README.md`, `publish/`
+
 > 📝 Правила: Статус меняется только после мержа PR. В заметки — только технические инсайты.
