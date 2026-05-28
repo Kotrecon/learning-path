@@ -1,60 +1,51 @@
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace ConsoleStarter.Services;
 
 public class PipelineWorker : BackgroundService
 {
-    private readonly string _serviceName;
-    private bool _isResourceActive;
+    private readonly ILogger<PipelineWorker> _logger;
 
-    public PipelineWorker()
+    public PipelineWorker(ILogger<PipelineWorker> logger)
     {
-        _serviceName = "PipelineWorker";
-        _isResourceActive = false;
+        _logger = logger;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        Console.WriteLine($"[{_serviceName}] Started");
-
-        // 1. Инициализация ресурса (БД, файл, очередь и т.д.)
-        await OpenResourceAsync();
+        _logger.LogInformation("Worker started");
 
         try
         {
             while (!stoppingToken.IsCancellationRequested)
             {
-                Console.WriteLine($"[{_serviceName}] Processing with active resource...");
+                _logger.LogDebug("Processing iteration...");
+
+                // Симуляция работы: иногда логируем Warning для демонстрации уровней
+                if (DateTime.Now.Second % 10 == 0)
+                {
+                    _logger.LogWarning("Retry attempt detected (demo)");
+                }
+
+                _logger.LogInformation("Processing with active resource...");
                 await Task.Delay(1000, stoppingToken);
             }
         }
         catch (OperationCanceledException)
         {
-            Console.WriteLine($"[{_serviceName}] Cancellation requested. Finishing current iteration...");
+            _logger.LogInformation("Cancellation requested. Finishing current iteration...");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Unexpected error in worker loop");
+            throw; // Пробрасываем дальше, чтобы сработал глобальный обработчик в Main
         }
         finally
         {
-            // 2. Гарантированная очистка (выполнится ВСЕГДА)
-            await CloseResourceAsync();
+            _logger.LogInformation("Resource closed & buffers flushed");
         }
 
-        Console.WriteLine($"[{_serviceName}] Stopped gracefully");
-    }
-
-    private Task OpenResourceAsync()
-    {
-        _isResourceActive = true;
-        Console.WriteLine($"[{_serviceName}] 📂 Resource opened (DB connection / file handle)");
-        return Task.CompletedTask;
-    }
-
-    private Task CloseResourceAsync()
-    {
-        if (_isResourceActive)
-        {
-            _isResourceActive = false;
-            Console.WriteLine($"[{_serviceName}] 📂 Resource closed & buffers flushed");
-        }
-        return Task.CompletedTask;
+        _logger.LogInformation("Worker stopped gracefully");
     }
 }
