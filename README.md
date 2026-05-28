@@ -9,7 +9,7 @@
 | [Python](languages/python/README.md)              | [Фаза 1](languages/python/phase-01-foundation/README.md)   | [Progress](languages/python/PROGRESS.md)                       |
 | HTML                                              | —                                                          | —                                                              |
 | JavaScript                                        | —                                                          | —                                                              |
-| [.NET](languages/csharp/ConsoleStarter/README.md) | [Фаза 1](languages/csharp/ConsoleStarter/phase1/README.md) | [Progress](languages/csharp/ConsoleStarter/phase1/PROGRESS.md) |
+| [.NET](languages/csharp/ConsoleStarter/README.md) | [Фаза 2](languages/csharp/ConsoleStarter/phase2/README.md) | [Progress](languages/csharp/ConsoleStarter/phase2/PROGRESS.md) |
 
 ## 🛠️ Инструменты
 
