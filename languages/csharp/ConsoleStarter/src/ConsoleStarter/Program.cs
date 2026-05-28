@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 
+
 // ============================================================================
 // Модуль 4 — Options & Runtime Reconfiguration
 // ============================================================================
@@ -17,7 +18,15 @@ builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnC
 // ----------------------------------------------------------------------------
 // Биндинг типизированных настроек
 // ----------------------------------------------------------------------------
-builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("App"));
+// Было:
+// builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("App"));
+
+// Стало (с валидацией):
+builder.Services
+    .AddOptions<AppSettings>()
+    .BindConfiguration("App")
+    .ValidateDataAnnotations()                // ← Проверяем атрибуты
+    .ValidateOnStart();                       // ← Fail-fast при старте
 
 // Регистрируем сервис-монитор (Singleton)
 builder.Services.AddSingleton<ConfigMonitorService>();

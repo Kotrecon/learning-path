@@ -34,12 +34,17 @@
 
 ## Секция 3: Валидация конфигурации при старте
 
-### [] Задача 4.3: Настроить валидацию конфига через DataAnnotations и ValidateOnStart
+### [x] Задача 4.3: Настроить валидацию конфига через DataAnnotations и ValidateOnStart
 
-- **Статус:** ⏳ In Progress
-- **Дата выполнения:**
-- **Коммит:**
+- **Статус:** ✅ Completed
+- **Дата выполнения:** 2026-05-27
+- **Коммит:** `feat(module4.3): add DataAnnotations validation with ValidateOnStart`
 - **Заметки/Наблюдения:**
+  - `ValidateOnStart()` гарантирует fail-fast: приложение не запустится с плохим конфигом
+  - Атрибуты `[Required]`, `[Range]` проверяются автоматически через `ValidateDataAnnotations()`
+  - ⚠️ **Важно**: для работы `ValidateDataAnnotations()` требуется пакет `Microsoft.Extensions.Options.DataAnnotations` (добавляется через `dotnet add package Microsoft.Extensions.Options.DataAnnotations`)
+  - 💡 Инсайт: Валидация на старте дешевле, чем обработка `NullReferenceException` в середине бизнес-процесса.
+  - `.BindConfiguration("App")` — более чистая альтернатива `.Bind(GetSection("App"))` в .NET 8/10
 
 ---
 
