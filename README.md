@@ -6,7 +6,7 @@
 
 | Язык                                              | План курса                                                 | Прогресс                                                       |
 | ------------------------------------------------- | ---------------------------------------------------------- | -------------------------------------------------------------- |
-| [Python](languages/python/README.md)              | [Фаза 1](languages/python/phase-01-foundation/README.md)   | [Progress](languages/python/PROGRESS.md)                       |
+| Python                                            | —                                                          | —                                                              |
 | HTML                                              | —                                                          | —                                                              |
 | JavaScript                                        | —                                                          | —                                                              |
 | [.NET](languages/csharp/ConsoleStarter/README.md) | [Фаза 2](languages/csharp/ConsoleStarter/phase2/README.md) | [Progress](languages/csharp/ConsoleStarter/phase2/PROGRESS.md) |
