@@ -17,20 +17,23 @@ public class PipelineWorker : BackgroundService
 
         try
         {
+            // 1. Кооперативная проверка: выходим только когда токен отменён
             while (!stoppingToken.IsCancellationRequested)
             {
                 Console.WriteLine($"[{_serviceName}] Processing...");
+
+                // 2. Токен передаётся в Delay → мгновенная реакция на Ctrl+C
                 await Task.Delay(1000, stoppingToken);
             }
         }
         catch (OperationCanceledException)
         {
-            // Ожидаемое завершение: токен отменён, выходим штатно
-            Console.WriteLine($"[{_serviceName}] Cancellation requested");
+            // 3. Штатная отмена: не ошибка, а плановое завершение
+            Console.WriteLine($"[{_serviceName}] Cancellation requested. Exiting loop...");
         }
         finally
         {
-            // Выполнится ВСЕГДА: и при штатном выходе из цикла, и при эксепшене
+            // 4. Гарантированная очистка (выполнится ВСЕГДА)
             Console.WriteLine($"[{_serviceName}] Stopped & resources released");
         }
     }

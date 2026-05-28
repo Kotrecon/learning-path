@@ -20,12 +20,16 @@
 
 ## Секция 2: Кооперативная отмена через CancellationToken
 
-### [] Задача 5.2: Реализовать проверку stoppingToken.IsCancellationRequested в цикле
+### [x] Задача 5.2: Реализовать проверку `stoppingToken.IsCancellationRequested` в цикле
 
-- **Статус:** ⏳ In Progress
-- **Дата выполнения:**
-- **Коммит:**
+- **Статус:** ✅ Completed
+- **Дата выполнения:** 2026-05-27
+- **Коммит:** `feat(module5.2): implement cooperative cancellation with try/catch/finally`
 - **Заметки/Наблюдения:**
+  - `while (!token.IsCancellationRequested)` — безопасная точка выхода из цикла
+  - `Task.Delay(..., token)` бросает `OperationCanceledException` при отмене, что мгновенно прерывает ожидание
+  - `catch (OperationCanceledException)` отделяет штатную остановку от реальных ошибок
+  - 💡 Инсайт: кооперативная отмена — это не «прервать», а «договориться завершиться в безопасной точке».
 
 ---
 
