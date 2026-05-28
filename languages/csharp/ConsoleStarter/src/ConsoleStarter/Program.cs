@@ -64,6 +64,24 @@ var monitorService = host.Services.GetRequiredService<ConfigMonitorService>();
 monitorService.PrintCurrentConfig();
 
 // ----------------------------------------------------------------------------
-// 6. ЗАПУСК ХОСТА (блокирует поток до сигнала остановки)
+// 6. ЗАПУСК ХОСТА + ГЛОБАЛЬНАЯ ОБРАБОТКА ОШИБОК (Задача 6.3)
 // ----------------------------------------------------------------------------
-await host.RunAsync();
+try
+{
+    await host.RunAsync();
+    // При штатной остановке (включая остановку из-за ошибки в BackgroundService)
+    // ExitCode остаётся 0 — это ожидаемое поведение для Generic Host
+}
+catch (Exception ex) when (ex is not OperationCanceledException)
+{
+    // Ловим ТОЛЬКО ошибки инициализации (до RunAsync) или критичные сбои хоста
+    Console.Error.WriteLine("\n🚨 CRITICAL ERROR: Application failed to run.");
+    Console.Error.WriteLine($"Message: {ex.Message}");
+
+    Directory.CreateDirectory("logs");
+    var logPath = $"logs/crash-report-{DateTime.Now:yyyyMMdd-HHmmss}.txt";
+    File.WriteAllText(logPath, $"[{DateTime.Now:O}]\n{ex}");
+    Console.Error.WriteLine($"📄 Crash report saved to: {logPath}");
+
+    Environment.ExitCode = 1;
+}

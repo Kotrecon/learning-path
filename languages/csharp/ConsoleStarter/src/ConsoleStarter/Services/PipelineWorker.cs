@@ -14,6 +14,8 @@ public class PipelineWorker : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
+        throw new InvalidOperationException("🔥 TEST: Simulated startup failure");
+
         _logger.LogInformation("Worker started");
 
         try
