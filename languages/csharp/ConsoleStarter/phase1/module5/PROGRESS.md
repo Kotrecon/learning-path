@@ -91,12 +91,12 @@
 
 ## ✅ Критерий приёмки модуля
 
-- `PipelineWorker` наследуется от `BackgroundService` и регистрируется через `AddHostedService`
-- `ExecuteAsync(CancellationToken)` содержит цикл с проверкой `stoppingToken.IsCancellationRequested`
-- `Task.Delay(..., stoppingToken)` используется для кооперативной отмены
-- При нажатии `Ctrl+C` воркер завершается за <1 секунды, логируется `"Worker stopped"`
-- `IHostApplicationLifetime.ApplicationStopping` регистрирует дополнительный лог при остановке
-- Все изменения зафиксированы в Git с понятной историей коммитов
+- [x] `PipelineWorker` наследуется от `BackgroundService` и регистрируется через `AddHostedService`
+- [x] `ExecuteAsync(CancellationToken)` содержит цикл с проверкой `stoppingToken.IsCancellationRequested`
+- [x] `Task.Delay(..., stoppingToken)` используется для кооперативной отмены
+- [x] При нажатии `Ctrl+C` воркер завершается за <1 секунды, логируется `"Worker stopped"`
+- [x] `IHostApplicationLifetime.ApplicationStopping` регистрирует дополнительный лог при остановке
+- [x] Все изменения зафиксированы в Git с понятной историей коммитов
 
 ---
 
