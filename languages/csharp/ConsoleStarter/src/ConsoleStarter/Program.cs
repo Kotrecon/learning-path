@@ -69,6 +69,21 @@ monitorService.PrintCurrentConfig();
 // }
 
 // ----------------------------------------------------------------------------
-// Запуск хоста: ждём сигнал остановки (Ctrl+C)
+// Запуск хоста + интеграционный тест завершения (Задача 5.4)
 // ----------------------------------------------------------------------------
+
+// Замер времени завершения: стартуем таймер в момент получения сигнала остановки
+var lifetime = host.Services.GetRequiredService<IHostApplicationLifetime>();
+var shutdownTimer = new System.Diagnostics.Stopwatch();
+lifetime.ApplicationStopping.Register(() => shutdownTimer.Start());
+
+// Запускаем хост (блокирует поток до остановки)
 await host.RunAsync();
+
+// Хост завершён — останавливаем таймер и выводим результат
+shutdownTimer.Stop();
+Console.WriteLine($"\n[Test] Graceful shutdown completed in {shutdownTimer.ElapsedMilliseconds} ms");
+if (shutdownTimer.ElapsedMilliseconds < 1000)
+    Console.WriteLine("[Test] ✅ PASS: Shutdown < 1s");
+else
+    Console.WriteLine("[Test] ⚠️ SLOW: Shutdown > 1s, check blocking calls");
