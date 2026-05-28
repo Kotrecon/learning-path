@@ -6,12 +6,15 @@
 
 ## Секция 1: Базовая реализация BackgroundService
 
-### [] Задача 5.1: Создать воркер, наследующий BackgroundService с ExecuteAsync
+### [x] Задача 5.1: Создать воркер, наследующий BackgroundService с ExecuteAsync
 
-- **Статус:** ⏳ In Progress
-- **Дата выполнения:**
-- **Коммит:**
+- **Статус:** ✅ Completed
+- **Дата выполнения:** 2026-05-27
+- **Коммит:** `feat(module5.1): implement PipelineWorker : BackgroundService`
 - **Заметки/Наблюдения:**
+  - `BackgroundService` снимает рутину по `StartAsync/StopAsync`, оставляя только `ExecuteAsync`
+  - `Task.Delay(..., stoppingToken)` гарантирует немедленную реакцию на отмену
+  - 💡 Инсайт: воркер — это не поток, а управляемая часть хоста. Доверяй жизненный цикл фреймворку.
 
 ---
 
