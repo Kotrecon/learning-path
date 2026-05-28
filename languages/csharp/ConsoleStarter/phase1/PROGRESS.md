@@ -40,7 +40,7 @@
 ## Модуль 6 — 🎯 Baseline Console Pipeline
 
 - **Статус:** ✅ Completed
-- **PR:** ⏳ Готовится к созданию
+- **PR:** [#6](https://github.com/Kotrecon/learning-path/pull/6)
 - **Коммит:** `feat: complete Module 6 — Baseline Console Pipeline`
 - **Артефакты:** `src/ConsoleStarter/Program.cs`, `src/ConsoleStarter/Services/PipelineWorker.cs`, `tests/ConsoleStarter.Tests/ParityTests.cs`, `phase1/module6/README.md`, `publish/`
 
