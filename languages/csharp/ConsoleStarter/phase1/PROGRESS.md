@@ -27,8 +27,15 @@
 ## Модуль 4 — 🔁 Options & Runtime Reconfiguration
 
 - **Статус:** ✅ Completed
-- **PR:** [#3](https://github.com/Kotrecon/learning-path/pull/4)
+- **PR:** [#4](https://github.com/Kotrecon/learning-path/pull/4)
 - **Коммит:** `feat: complete Module 4 — Options & Runtime Reconfiguration`
 - **Артефакты:** `src/ConsoleStarter/Services/ConfigMonitorService.cs`, `src/ConsoleStarter/Services/WorkerService.cs`, `src/ConsoleStarter/AppSettings.cs`, `phase1/module4/README.md`
+
+## Модуль 5 — 🔄 BackgroundService & Cancellation
+
+- **Статус:** ✅ Completed
+- **PR:** ⏳ Готовится к созданию
+- **Коммит:** `feat: complete Module 5 — BackgroundService & Cancellation`
+- **Артефакты:** `src/ConsoleStarter/Services/PipelineWorker.cs`, `src/ConsoleStarter/Program.cs`, `phase1/module5/README.md`
 
 > 📝 Правила: Статус меняется только после мержа PR. В заметки — только технические инсайты.
