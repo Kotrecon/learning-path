@@ -31,6 +31,9 @@ builder.Services
 // Регистрируем сервис-монитор (Singleton)
 builder.Services.AddSingleton<ConfigMonitorService>();
 
+// Регистрируем фоновый воркер (хост сам вызовет StartAsync/StopAsync)
+builder.Services.AddHostedService<WorkerService>();
+
 var host = builder.Build();
 
 // ----------------------------------------------------------------------------
