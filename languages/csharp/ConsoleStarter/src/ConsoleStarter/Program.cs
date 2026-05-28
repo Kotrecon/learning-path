@@ -30,6 +30,25 @@ builder.Services.AddHostedService<PipelineWorker>();
 
 var host = builder.Build();
 
+// === Подписка на события жизненного цикла (Задача 5.5) ===
+var lifetime = host.Services.GetRequiredService<IHostApplicationLifetime>();
+
+lifetime.ApplicationStarted.Register(() =>
+{
+    Console.WriteLine("\n[App] 🟢 ApplicationStarted: all services initialized");
+});
+
+lifetime.ApplicationStopping.Register(() =>
+{
+    Console.WriteLine("\n[App] 🟡 ApplicationStopping: shutdown signal received");
+});
+
+lifetime.ApplicationStopped.Register(() =>
+{
+    Console.WriteLine("\n[App] 🔴 ApplicationStopped: all services completed");
+});
+// =========================================================
+
 // ----------------------------------------------------------------------------
 // Демонстрация: чтение конфига разными способами
 // ----------------------------------------------------------------------------
@@ -73,7 +92,7 @@ monitorService.PrintCurrentConfig();
 // ----------------------------------------------------------------------------
 
 // Замер времени завершения: стартуем таймер в момент получения сигнала остановки
-var lifetime = host.Services.GetRequiredService<IHostApplicationLifetime>();
+// var lifetime = host.Services.GetRequiredService<IHostApplicationLifetime>();
 var shutdownTimer = new System.Diagnostics.Stopwatch();
 lifetime.ApplicationStopping.Register(() => shutdownTimer.Start());
 

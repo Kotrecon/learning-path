@@ -63,12 +63,16 @@
 
 ## Секция 5: События жизненного цикла через IHostApplicationLifetime
 
-### [] Задача 5.5: Подписаться на события ApplicationStopping для дополнительной логики
+### [x] Задача 5.5: Подписаться на события ApplicationStopping для дополнительной логики
 
-- **Статус:** ⏳ In Progress
-- **Дата выполнения:**
-- **Коммит:**
+- **Статус:** ✅ Completed
+- **Дата выполнения:** 2026-05-27
+- **Коммит:** `feat(module5.5): subscribe to IHostApplicationLifetime events for infrastructure hooks`
 - **Заметки/Наблюдения:**
+  - `ApplicationStopping` срабатывает **до** остановки `IHostedService` — удобно для финального логирования
+  - `ApplicationStopped` срабатывает **после** всех сервисов — удобно для метрик завершения
+  - ⚠️ Хуки должны быть короткими: тяжёлая работа в них блокирует остановку хоста
+  - 💡 Инсайт: `IHostApplicationLifetime` — это orchestration, а `CancellationToken` — это кооперация. Используй оба.
 
 ---
 
