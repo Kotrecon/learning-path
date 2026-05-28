@@ -1,47 +1,73 @@
 ﻿using ConsoleStarter;
+using ConsoleStarter.Services;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 
 // ============================================================================
-// Модуль 3 — Конфигурация
+// Модуль 4 — Options & Runtime Reconfiguration
 // ============================================================================
 
 var builder = Host.CreateApplicationBuilder(args);
 
-// ----------------------------------------------------------------------------
-// 3.1: Базовое чтение из appsettings.json (через IConfiguration)
-// Требования:
-//   • Файл appsettings.json в проекте с <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-//   • Разделитель вложенности — двоеточие :  (App:Timeout)
-//   • Все значения приходят как string, приведение типов — вручную
-// ----------------------------------------------------------------------------
-Console.WriteLine("\n=== Config: JSON (IConfiguration) ===");
-Console.WriteLine($"Name: {builder.Configuration["App:Name"]}");
-Console.WriteLine($"Timeout: {builder.Configuration["App:Timeout"]} (Type: string)");
+// Явно включаем отслеживание изменений файла
+builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
 
 // ----------------------------------------------------------------------------
-// 3.5: Типизированный доступ через IOptions<T>
-// Дополнительные требования (сверх 3.1):
-//   • Record/класс с параметрless конструктором (init-свойства, не позиционные)
-//   • Регистрация: builder.Services.Configure<T>(section)
-//   • Резолв: host.Services.GetRequiredService<IOptions<T>>().Value
-//   • Биндинг происходит при первом .Value, затем кэшируется как Singleton
-//   • Автоматическое приведение типов: "30" → int 30
+// Биндинг типизированных настроек с валидацией
 // ----------------------------------------------------------------------------
-builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("App"));
+builder.Services
+    .AddOptions<AppSettings>()
+    .BindConfiguration("App")
+    .ValidateDataAnnotations()                // ← Проверяем атрибуты
+    .ValidateOnStart();                       // ← Fail-fast при старте
+
+// Регистрируем сервисы
+builder.Services.AddSingleton<ConfigMonitorService>();
+builder.Services.AddHostedService<WorkerService>();
 
 var host = builder.Build();
 
+// ----------------------------------------------------------------------------
+// Демонстрация: чтение конфига разными способами
+// ----------------------------------------------------------------------------
+
+// 1. Через IConfiguration (возвращает string)
+Console.WriteLine("\n=== Config: IConfiguration ===");
+Console.WriteLine($"Name: {builder.Configuration["App:Name"]}");
+Console.WriteLine($"Timeout: {builder.Configuration["App:Timeout"]} (Type: string)");
+
+// 2. Через IOptions<T> (статичный снимок, автоматическое приведение типов)
 var settings = host.Services.GetRequiredService<IOptions<AppSettings>>().Value;
-Console.WriteLine("\n=== Config: IOptions<T> Binding ===");
+Console.WriteLine("\n=== Config: IOptions<T> ===");
 Console.WriteLine($"Name: {settings.Name} (Type: {settings.Name.GetType().Name})");
 Console.WriteLine($"Timeout: {settings.Timeout} (Type: {settings.Timeout.GetType().Name})");
 
+// 3. Через IOptionsMonitor<T> (реактивный, актуальное значение)
+var monitorService = host.Services.GetRequiredService<ConfigMonitorService>();
+monitorService.PrintCurrentConfig();
+
+// 4. Через IOptionsSnapshot<T> (per-scope изоляция)
+Console.WriteLine("\n=== Config: IOptionsSnapshot<T> (Per-Scope) ===");
+Console.WriteLine("[Scope 1] Reading config...");
+using (var scope1 = host.Services.CreateScope())
+{
+    var snap1 = scope1.ServiceProvider.GetRequiredService<IOptionsSnapshot<AppSettings>>();
+    Console.WriteLine($"[Scope 1] Timeout: {snap1.Value.Timeout} (frozen for this scope)");
+}
+
+Console.WriteLine("\n💡 Измени appsettings.json сейчас, если хочешь проверить обновление между скоупами.");
+Console.WriteLine("⏳ Ждём 20 секунд...");
+await Task.Delay(20000);
+
+using (var scope2 = host.Services.CreateScope())
+{
+    var snap2 = scope2.ServiceProvider.GetRequiredService<IOptionsSnapshot<AppSettings>>();
+    Console.WriteLine($"[Scope 2] Timeout: {snap2.Value.Timeout} (new snapshot)");
+}
+
 // ----------------------------------------------------------------------------
-// Запуск/остановка хоста
-// Для тестов: StartAsync + StopAsync (процесс завершается сам)
-// Для прода:   await host.RunAsync() (ждёт Ctrl+C / SIGTERM)
+// Запуск хоста: ждём сигнал остановки (Ctrl+C)
 // ----------------------------------------------------------------------------
-await host.StartAsync();
-await host.StopAsync();
+await host.RunAsync();
