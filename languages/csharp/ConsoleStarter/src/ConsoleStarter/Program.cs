@@ -41,7 +41,7 @@ builder.Services.AddSingleton<ConfigMonitorService>();
 builder.Services.AddHostedService<PipelineWorker>();
 
 // Модуль 7: Включить JSON-форматер
-builder.Logging.AddJsonConsole();
+builder.Logging.AddJsonConsole(options => options.IncludeScopes = true);
 
 // ----------------------------------------------------------------------------
 // 4. BUILD (материализация хоста и контейнера)
@@ -69,6 +69,12 @@ monitorService.PrintCurrentConfig();
 // модуль 7
 
 var logger = host.Services.GetRequiredService<ILogger<Program>>();
+
+using var scope = logger.BeginScope(new { TransactionId = Guid.NewGuid().ToString("N") });
+
+logger.LogInformation("Step about scope: Starting");
+logger.LogInformation("Step about scope: Processing");
+logger.LogInformation("Step about scope: Completed");
 
 logger.LogInformation("User {UserId} from {Ip} accessed {Resource}", 123, "10.0.0.1", "/api/data");
 
