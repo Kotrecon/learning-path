@@ -3,6 +3,7 @@ using ConsoleStarter.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 // ============================================================================
@@ -62,6 +63,14 @@ Console.WriteLine($"Timeout: {settings.Timeout} (Type: {settings.Timeout.GetType
 // 5.3: IOptionsMonitor<T> (реактивный доступ)
 var monitorService = host.Services.GetRequiredService<ConfigMonitorService>();
 monitorService.PrintCurrentConfig();
+// модуль 7
+
+var logger = host.Services.GetRequiredService<ILogger<Program>>();
+
+logger.LogTrace("Trace message");
+logger.LogInformation("Information message");
+logger.LogWarning("Warning message");
+logger.LogError("Error message");
 
 // ----------------------------------------------------------------------------
 // 6. ЗАПУСК ХОСТА + ГЛОБАЛЬНАЯ ОБРАБОТКА ОШИБОК (Задача 6.3)
