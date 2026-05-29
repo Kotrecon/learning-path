@@ -40,6 +40,9 @@ builder.Services.AddSingleton<ConfigMonitorService>();
 // Модуль 5: фоновый воркер с кооперативной отменой
 builder.Services.AddHostedService<PipelineWorker>();
 
+// Модуль 7: Включить JSON-форматер
+builder.Logging.AddJsonConsole();
+
 // ----------------------------------------------------------------------------
 // 4. BUILD (материализация хоста и контейнера)
 // ----------------------------------------------------------------------------
@@ -66,6 +69,8 @@ monitorService.PrintCurrentConfig();
 // модуль 7
 
 var logger = host.Services.GetRequiredService<ILogger<Program>>();
+
+logger.LogInformation("User {UserId} from {Ip} accessed {Resource}", 123, "10.0.0.1", "/api/data");
 
 logger.LogTrace("Trace message");
 logger.LogInformation("Information message");
