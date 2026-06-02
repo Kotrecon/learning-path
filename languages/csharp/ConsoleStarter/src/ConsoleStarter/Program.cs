@@ -41,7 +41,13 @@ builder.Services.AddSingleton<ConfigMonitorService>();
 builder.Services.AddHostedService<PipelineWorker>();
 
 // Модуль 7: Включить JSON-форматер
-builder.Logging.AddJsonConsole(options => options.IncludeScopes = true);
+builder.Logging.ClearProviders();
+
+builder.Logging.AddJsonConsole(options =>
+{
+    options.IncludeScopes = true;
+    options.JsonWriterOptions = new System.Text.Json.JsonWriterOptions { Indented = false };
+});
 
 // ----------------------------------------------------------------------------
 // 4. BUILD (материализация хоста и контейнера)
