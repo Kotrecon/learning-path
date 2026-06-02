@@ -6,10 +6,10 @@
 
 ## Модуль 7 — 🔍 Structured Logging Basics
 
-- **Статус:** ⏳ Not Started
-- **PR:**
-- **Коммит:**
-- **Артефакты:** `src/ConsoleStarter/Program.cs` (JsonConsoleFormatter), `phase2/module7/README.md`
+- **Статус:** ✅ Completed
+- **PR:** [#7](https://github.com/Kotrecon/learning-path/pull/7)
+- **Коммит:** `docs(module7.6): finalize progress tracker for module 7`
+- **Артефакты:** `src/ConsoleStarter/Program.cs` (JsonConsoleFormatter + scopes + templates), `phase2/module7/README.md`
 - **Ключевые навыки:** `ILogger<T>`, Message Templates, Logging Scopes, JSON-форматирование
 
 ---
