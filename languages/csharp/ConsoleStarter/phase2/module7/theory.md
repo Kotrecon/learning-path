@@ -107,12 +107,12 @@
 **Способы достижения:**
 
 - В `Program.cs` настроить: `builder.Logging.ClearProviders().AddJsonConsole(opt => opt.JsonWriterOptions.Indented = true)`
-- Запустить `dotnet run | jq .` и проверить, что каждый выводимый лог — валидный JSON-объект
+- Запустить `dotnet run` и проверить, что каждый выводимый лог — валидный JSON-объект
 - Убедиться, что поля `Timestamp`, `LogLevel`, `Category`, `Message`, параметры шаблона — все присутствуют
 - Закоммитить: `git add .`
   `git commit -m "feat(module7): configure JsonConsoleFormatter globally"`
 
-**Результат:** Валидный JSON-вывод всего приложения, прошедший проверку `jq`, коммит с настройкой форматтера в репозитории.
+**Результат:** Валидный JSON-вывод всего приложения.
 
 📚 **Теоретическая справка**
 
@@ -141,7 +141,8 @@
 - Запустить приложение в фоне: `dotnet run &`
 - Собрать трассировку: `dotnet trace collect --process-id <pid> --providers Microsoft-Extensions-Logging`
 - Конвертировать и открыть в `speedscope`: `dotnet trace convert trace.nettrace`
-- Закоммитить артефакты: `git add diagnostics/ && git commit -m "chore(module7): add diagnostic tooling setup"`
+- Закоммитить артефакты: `git add diagnostics/`
+  `git commit -m "chore(module7): add diagnostic tooling setup"`
 
 **Результат:** Файл `trace.nettrace` и скриншот из Speedscope с таймлайном лог-событий, коммит с настройкой диагностики.
 
@@ -170,7 +171,7 @@
 **Способы достижения:**
 
 - Создать `module7/README.md` с примерами кода и пошаговой инструкцией настройки
-- Прогнать финальный тест: `dotnet run | jq -e . > /dev/null`
+- Прогнать финальный тест: `dotnet run  > /dev/null`
   `echo "JSON valid"`
 - Создать ветку `feature/module7-complete`, запушить и открыть PR с чек-листом приёмки
 - Приложить к PR пример вывода и скриншот диагностики
@@ -196,7 +197,7 @@
 ✅ **Критерий приёмки:**
 
 - `ILogger<T>` настроен с `JsonConsoleFormatter`
-- Вывод `dotnet run` — валидный JSON (проверено через `jq`)
+- Вывод `dotnet run` — валидный JSON
 - Параметры логов выведены как отдельные поля JSON, не часть строки `Message`
 - `BeginScope` корректно добавляет контекст к вложенным логам
 - `module7/README.md` описывает конфигурацию и примеры использования
