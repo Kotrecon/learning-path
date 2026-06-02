@@ -3,6 +3,7 @@ using ConsoleStarter.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 // ============================================================================
@@ -39,6 +40,15 @@ builder.Services.AddSingleton<ConfigMonitorService>();
 // Модуль 5: фоновый воркер с кооперативной отменой
 builder.Services.AddHostedService<PipelineWorker>();
 
+// Модуль 7: Включить JSON-форматер
+builder.Logging.ClearProviders();
+
+builder.Logging.AddJsonConsole(options =>
+{
+    options.IncludeScopes = true;
+    options.JsonWriterOptions = new System.Text.Json.JsonWriterOptions { Indented = false };
+});
+
 // ----------------------------------------------------------------------------
 // 4. BUILD (материализация хоста и контейнера)
 // ----------------------------------------------------------------------------
@@ -62,6 +72,22 @@ Console.WriteLine($"Timeout: {settings.Timeout} (Type: {settings.Timeout.GetType
 // 5.3: IOptionsMonitor<T> (реактивный доступ)
 var monitorService = host.Services.GetRequiredService<ConfigMonitorService>();
 monitorService.PrintCurrentConfig();
+// модуль 7
+
+var logger = host.Services.GetRequiredService<ILogger<Program>>();
+
+using var scope = logger.BeginScope(new { TransactionId = Guid.NewGuid().ToString("N") });
+
+logger.LogInformation("Step about scope: Starting");
+logger.LogInformation("Step about scope: Processing");
+logger.LogInformation("Step about scope: Completed");
+
+logger.LogInformation("User {UserId} from {Ip} accessed {Resource}", 123, "10.0.0.1", "/api/data");
+
+logger.LogTrace("Trace message");
+logger.LogInformation("Information message");
+logger.LogWarning("Warning message");
+logger.LogError("Error message");
 
 // ----------------------------------------------------------------------------
 // 6. ЗАПУСК ХОСТА + ГЛОБАЛЬНАЯ ОБРАБОТКА ОШИБОК (Задача 6.3)
