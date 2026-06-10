@@ -16,10 +16,10 @@
 
 ## Модуль 8 — 📡 OpenTelemetry Integration
 
-- **Статус:** ⏳ Not Started
-- **PR:**
-- **Коммит:**
-- **Артефакты:** `src/ConsoleStarter/Program.cs` (AddOpenTelemetry), `ActivitySource`, `Meter`, `phase2/module8/README.md`
+- **Статус:** ✅ Completed
+- **PR:** [#8](https://github.com/Kotrecon/learning-path/pull/8)
+- **Коммит:** `docs(module8.6): add module README and finalize progress tracker`
+- **Артефакты:** `src/ConsoleStarter/Program.cs` (AddOpenTelemetry, ActivitySource, Meter, OTLP config), `phase2/module8/README.md`
 - **Ключевые навыки:** OTel SDK, Tracing, Metrics, Console/OTLP Exporters
 
 ---
