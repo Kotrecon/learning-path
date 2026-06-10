@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using OpenTelemetry.Exporter;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
 
@@ -67,13 +68,23 @@ builder.Services.AddOpenTelemetry()
             t.AddSource("EP.ConsoleStarter");
             t.SetSampler(new AlwaysOnSampler());
             t.AddConsoleExporter();
-
+            t.AddOtlpExporter(options =>
+            {
+                options.Endpoint = new Uri("http://localhost:4317");
+                options.Protocol = OtlpExportProtocol.HttpProtobuf;
+            });
         })
     .WithMetrics(m =>
         {
             m.AddMeter("EP.ConsoleStarter");
             m.AddConsoleExporter();
+            m.AddOtlpExporter(options =>
+            {
+                options.Endpoint = new Uri("http://localhost:4317");
+                options.Protocol = OtlpExportProtocol.HttpProtobuf;
+            });
         });
+
 
 
 using var activitySource = new System.Diagnostics.ActivitySource("EP.ConsoleStarter", "1.0.0");
