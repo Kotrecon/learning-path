@@ -6,6 +6,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
+
 // ============================================================================
 // Модуль 6 — 🎯 Baseline Console Pipeline
 // Финальная оркестрация: config → options → DI → build → run → shutdown → log
@@ -40,14 +41,25 @@ builder.Services.AddSingleton<ConfigMonitorService>();
 // Модуль 5: фоновый воркер с кооперативной отменой
 builder.Services.AddHostedService<PipelineWorker>();
 
-// Модуль 7: Включить JSON-форматер
+// ----------------------------------------------------------------------------
+// 7. Модуль 7: Включить JSON-форматер
+// ----------------------------------------------------------------------------
+
 builder.Logging.ClearProviders();
 
-builder.Logging.AddJsonConsole(options =>
-{
-    options.IncludeScopes = true;
-    options.JsonWriterOptions = new System.Text.Json.JsonWriterOptions { Indented = false };
-});
+builder.Logging.AddConsole();
+
+// builder.Logging.AddJsonConsole(options =>
+// {
+//     options.IncludeScopes = true;
+//     options.JsonWriterOptions = new System.Text.Json.JsonWriterOptions { Indented = false };
+// });
+// ----------------------------------------------------------------------------
+// 8. OTEl (подключение трейсов и метрик)
+// ----------------------------------------------------------------------------
+builder.Services.AddOpenTelemetry()
+    .WithTracing(t => t.AddSource("EP.ConsoleStarter"))
+    .WithMetrics(m => m.AddMeter("EP.ConsoleStarter"));
 
 // ----------------------------------------------------------------------------
 // 4. BUILD (материализация хоста и контейнера)

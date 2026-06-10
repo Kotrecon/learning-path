@@ -6,12 +6,15 @@
 
 ## Секция 1: Инициализация OTel SDK
 
-### [ ] Задача 8.1: Настроить базовую инициализацию OpenTelemetry SDK с провайдерами сигналов
+### [x] Задача 8.1: Настроить базовую инициализацию OpenTelemetry SDK с провайдерами сигналов
 
-- **Статус:** ⏳
-- **Дата выполнения:**
-- **Коммит:**
+- **Статус:** ✅ Completed
+- **Дата выполнения:** 2026-06-10
+- **Коммит:** `feat(module8.1): initialize OpenTelemetry SDK with Tracing and Metrics providers`
 - **Заметки/Наблюдения:**
+  - Пакет `OpenTelemetry.Extensions.Hosting` обязателен для `AddOpenTelemetry()` на `IServiceCollection`
+  - `AddSource("EP.ConsoleStarter")` и `AddMeter("EP.ConsoleStarter")` регистрируют имена источников
+  - 💡 Инсайт: OTel SDK — единая точка входа. Без `Extensions.Hosting` метод не резолвится для DI.
 
 ---
 
