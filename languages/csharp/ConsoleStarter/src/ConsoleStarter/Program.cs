@@ -5,6 +5,12 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using OpenTelemetry.Exporter;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Trace;
+
+var AppMeter = new System.Diagnostics.Metrics.Meter("EP.ConsoleStarter", "1.0.0");
+var ItemsProcessed = AppMeter.CreateCounter<long>("items.processed", description: "Number of items processed");
 
 // ============================================================================
 // Модуль 6 — 🎯 Baseline Console Pipeline
@@ -40,19 +46,54 @@ builder.Services.AddSingleton<ConfigMonitorService>();
 // Модуль 5: фоновый воркер с кооперативной отменой
 builder.Services.AddHostedService<PipelineWorker>();
 
-// Модуль 7: Включить JSON-форматер
+// ----------------------------------------------------------------------------
+// 7. Модуль 7: Включить JSON-форматер
+// ----------------------------------------------------------------------------
+
 builder.Logging.ClearProviders();
 
-builder.Logging.AddJsonConsole(options =>
-{
-    options.IncludeScopes = true;
-    options.JsonWriterOptions = new System.Text.Json.JsonWriterOptions { Indented = false };
-});
+builder.Logging.AddConsole();
+
+// builder.Logging.AddJsonConsole(options =>
+// {
+//     options.IncludeScopes = true;
+//     options.JsonWriterOptions = new System.Text.Json.JsonWriterOptions { Indented = false };
+// });
+// ----------------------------------------------------------------------------
+// 8. OTEl (подключение трейсов и метрик)
+// ----------------------------------------------------------------------------
+builder.Services.AddOpenTelemetry()
+    .WithTracing(t =>
+        {
+            t.AddSource("EP.ConsoleStarter");
+            t.SetSampler(new AlwaysOnSampler());
+            t.AddConsoleExporter();
+            t.AddOtlpExporter(options =>
+            {
+                options.Endpoint = new Uri("http://localhost:4317");
+                options.Protocol = OtlpExportProtocol.HttpProtobuf;
+            });
+        })
+    .WithMetrics(m =>
+        {
+            m.AddMeter("EP.ConsoleStarter");
+            m.AddConsoleExporter();
+            m.AddOtlpExporter(options =>
+            {
+                options.Endpoint = new Uri("http://localhost:4317");
+                options.Protocol = OtlpExportProtocol.HttpProtobuf;
+            });
+        });
+
+
+
+using var activitySource = new System.Diagnostics.ActivitySource("EP.ConsoleStarter", "1.0.0");
 
 // ----------------------------------------------------------------------------
 // 4. BUILD (материализация хоста и контейнера)
 // ----------------------------------------------------------------------------
 var host = builder.Build();
+
 
 // ----------------------------------------------------------------------------
 // 5. ДЕМОНСТРАЦИЯ (резолв работает ТОЛЬКО после Build())
@@ -94,9 +135,22 @@ logger.LogError("Error message");
 // ----------------------------------------------------------------------------
 try
 {
-    await host.RunAsync();
+    await host.StartAsync();
     // При штатной остановке (включая остановку из-за ошибки в BackgroundService)
     // ExitCode остаётся 0 — это ожидаемое поведение для Generic Host
+    using (var activity = activitySource.StartActivity("ProcessData"))
+    {
+        activity?.SetTag("item.count", 10);
+        activity?.SetTag("user.id", 123);
+
+        // Записываем метрику
+        ItemsProcessed.Add(1, new KeyValuePair<string, object?>("item.type", "report"));
+
+        await Task.Delay(100);
+    }
+
+    // Блокируемся до остановки
+    await host.WaitForShutdownAsync();
 }
 catch (Exception ex) when (ex is not OperationCanceledException)
 {
