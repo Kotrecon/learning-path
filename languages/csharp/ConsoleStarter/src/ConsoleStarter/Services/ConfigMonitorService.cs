@@ -19,7 +19,7 @@ public class ConfigMonitorService : IDisposable
         // Простая подписка на изменения конфига
         _subscription = _monitor.OnChange((settings, name) =>
         {
-            Console.WriteLine("[{_serviceName}] Config changed!", _serviceName);
+            _logger.LogInformation("[{_serviceName}] Config changed!", _serviceName);
 
             _logger.LogInformation("[{_serviceName}] Name={Name}, Timeout={Timeout}", _serviceName, settings.Name, settings.Timeout);
         });

@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using OpenTelemetry.Trace;
 
 
 // ============================================================================
@@ -58,14 +59,32 @@ builder.Logging.AddConsole();
 // 8. OTEl (подключение трейсов и метрик)
 // ----------------------------------------------------------------------------
 builder.Services.AddOpenTelemetry()
-    .WithTracing(t => t.AddSource("EP.ConsoleStarter"))
+    .WithTracing(t =>
+        {
+            t.AddSource("EP.ConsoleStarter");
+            t.SetSampler(new AlwaysOnSampler());
+            t.AddConsoleExporter();
+
+        })
     .WithMetrics(m => m.AddMeter("EP.ConsoleStarter"));
+
+using var activitySource = new System.Diagnostics.ActivitySource("EP.ConsoleStarter", "1.0.0");
+
 
 // ----------------------------------------------------------------------------
 // 4. BUILD (материализация хоста и контейнера)
 // ----------------------------------------------------------------------------
 var host = builder.Build();
 
+// using (var activity = activitySource.StartActivity("ProcessData"))
+// {
+//     Console.WriteLine($"[DEBUG] Activity created: {activity != null}");
+//     Console.WriteLine($"[DEBUG] ActivitySource has listeners: {activitySource.HasListeners()}");
+
+//     activity?.SetTag("item.count", 10);
+//     activity?.SetTag("user.id", 123);
+//     System.Threading.Thread.Sleep(100);
+// }
 // ----------------------------------------------------------------------------
 // 5. ДЕМОНСТРАЦИЯ (резолв работает ТОЛЬКО после Build())
 // ----------------------------------------------------------------------------
@@ -106,9 +125,18 @@ logger.LogError("Error message");
 // ----------------------------------------------------------------------------
 try
 {
-    await host.RunAsync();
+    await host.StartAsync();
     // При штатной остановке (включая остановку из-за ошибки в BackgroundService)
     // ExitCode остаётся 0 — это ожидаемое поведение для Generic Host
+    using (var activity = activitySource.StartActivity("ProcessData"))
+    {
+        activity?.SetTag("item.count", 10);
+        activity?.SetTag("user.id", 123);
+        System.Threading.Thread.Sleep(100);
+    }
+
+    // Блокируемся до остановки
+    await host.WaitForShutdownAsync();
 }
 catch (Exception ex) when (ex is not OperationCanceledException)
 {
