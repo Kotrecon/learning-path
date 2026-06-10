@@ -5,8 +5,11 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
 
+var AppMeter = new System.Diagnostics.Metrics.Meter("EP.ConsoleStarter", "1.0.0");
+var ItemsProcessed = AppMeter.CreateCounter<long>("items.processed", description: "Number of items processed");
 
 // ============================================================================
 // Модуль 6 — 🎯 Baseline Console Pipeline
@@ -66,25 +69,21 @@ builder.Services.AddOpenTelemetry()
             t.AddConsoleExporter();
 
         })
-    .WithMetrics(m => m.AddMeter("EP.ConsoleStarter"));
+    .WithMetrics(m =>
+        {
+            m.AddMeter("EP.ConsoleStarter");
+            m.AddConsoleExporter();
+        });
+
 
 using var activitySource = new System.Diagnostics.ActivitySource("EP.ConsoleStarter", "1.0.0");
-
 
 // ----------------------------------------------------------------------------
 // 4. BUILD (материализация хоста и контейнера)
 // ----------------------------------------------------------------------------
 var host = builder.Build();
 
-// using (var activity = activitySource.StartActivity("ProcessData"))
-// {
-//     Console.WriteLine($"[DEBUG] Activity created: {activity != null}");
-//     Console.WriteLine($"[DEBUG] ActivitySource has listeners: {activitySource.HasListeners()}");
 
-//     activity?.SetTag("item.count", 10);
-//     activity?.SetTag("user.id", 123);
-//     System.Threading.Thread.Sleep(100);
-// }
 // ----------------------------------------------------------------------------
 // 5. ДЕМОНСТРАЦИЯ (резолв работает ТОЛЬКО после Build())
 // ----------------------------------------------------------------------------
@@ -132,7 +131,11 @@ try
     {
         activity?.SetTag("item.count", 10);
         activity?.SetTag("user.id", 123);
-        System.Threading.Thread.Sleep(100);
+
+        // Записываем метрику
+        ItemsProcessed.Add(1, new KeyValuePair<string, object?>("item.type", "report"));
+
+        await Task.Delay(100);
     }
 
     // Блокируемся до остановки
