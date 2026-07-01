@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using ConsoleStarter;
 using ConsoleStarter.Services;
 using Microsoft.Extensions.Configuration;
@@ -5,11 +6,11 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using OpenTelemetry;
 using OpenTelemetry.Exporter;
 using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
-using System.Diagnostics;
 
 var AppMeter = new System.Diagnostics.Metrics.Meter("EP.ConsoleStarter", "1.0.0");
 var ItemsProcessed = AppMeter.CreateCounter<long>("items.processed", description: "Number of items processed");
@@ -142,14 +143,23 @@ try
     {
         activity?.SetTag("item.count", 10);
 
+        // проверяем логирование
         logger.LogInformation("Processing started with item count {ItemCount}", 10);
         logger.LogInformation("Processing completed");
 
         // Записываем метрику
         ItemsProcessed.Add(1, new KeyValuePair<string, object?>("item.type", "report"));
 
+        // вычлиняем корреляйшен
         var correlationId = Activity.Current?.TraceId.ToString() ?? Guid.NewGuid().ToString("N");
         logger.LogInformation("Processing with CorrelationId={CorrelationId}", correlationId);
+
+        // создаем и извлекаем Baggage
+        Baggage.SetBaggage("user.id", "123");
+        Baggage.SetBaggage("tenant.id", "abc");
+        var userId = Baggage.Current.GetBaggage("user.id");
+        var tenantId = Baggage.Current.GetBaggage("tenant.id");
+        logger.LogInformation("Baggage loaded: UserId={UserId}, TenantId={TenantId}", userId, tenantId);
 
         await Task.Delay(100);
     }

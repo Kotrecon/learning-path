@@ -6,34 +6,49 @@
 
 ## Секция 1: TraceId & SpanId в логах
 
-### [ ] Задача 9.1: Включить автоматическую инъекцию TraceId/SpanId в логи через OTel
+### [x] Задача 9.1: Включить автоматическую инъекцию TraceId/SpanId в логи через OTel
 
-- **Статус:** ⏳
-- **Дата выполнения:**
-- **Коммит:**
+- **Статус:** ✅ Completed
+- **Дата выполнения:** 2026-07-01
+- **Коммит:** `feat(module9.1): enable TraceId/SpanId injection in logs`
 - **Заметки/Наблюдения:**
+  - `AddConsoleExporter()` для логов работает через `builder.Logging.AddOpenTelemetry(logging => logging.AddConsoleExporter())`, а НЕ через `IServiceCollection.AddOpenTelemetry().WithLogs()`
+  - Обязателен `using OpenTelemetry.Logs;` — без него компилятор не видит extension method
+  - Логи `Program[0]` внутри Activity содержат `LogRecord.TraceId` и `LogRecord.SpanId`
+  - Логи вне Activity (PipelineWorker, ConfigMonitor) **не** содержат trace-контекст
+  - 💡 Инсайт: Экспортеры для логов настраиваются через `builder.Logging`, а не через `builder.Services`
 
 ---
 
 ## Секция 2: CorrelationId — бизнес-идентификатор запроса
 
-### [ ] Задача 9.2: Реализовать извлечение и логирование CorrelationId из Activity
+### [x] Задача 9.2: Реализовать извлечение и логирование CorrelationId из Activity
 
-- **Статус:** ⏳
-- **Дата выполнения:**
-- **Коммит:**
+- **Статус:** ✅ Completed
+- **Дата выполнения:** 2026-07-01
+- **Коммит:** `feat(module9.2): implement CorrelationId logging from Activity`
 - **Заметки/Наблюдения:**
+  - `Activity.Current?.TraceId.ToString()` возвращает hex-строку 128 бит
+  - Fallback: `Guid.NewGuid().ToString("N")` когда Activity нет
+  - CorrelationId совпадает с `LogRecord.TraceId` — подтверждение сквозной связи
+  - Нужен `using System.Diagnostics;` для доступа к `Activity.Current`
+  - 💡 Инсайт: CorrelationId = бизнес-имя для TraceId. В проде можно добавить префикс/формат
 
 ---
 
 ## Секция 3: Baggage — кастомный контекст в трейсах
 
-### [ ] Задача 9.3: Настроить передачу кастомных данных через Baggage API
+### [x] Задача 9.3: Настроить передачу кастомных данных через Baggage API
 
-- **Статус:** ⏳
-- **Дата выполнения:**
-- **Коммит:**
+- **Статус:** ✅ Completed
+- **Дата выполнения:** 2026-07-01
+- **Коммит:** `feat(module9.3): use Baggage for custom context propagation`
 - **Заметки/Наблюдения:**
+  - `Baggage.SetBaggage("user.id", "123")` — установка значений
+  - `Baggage.Current.GetBaggage("user.id")` — чтение значений
+  - Значения доступны в том же контексте выполнения
+  - Нужен `using OpenTelemetry.Context;`
+  - 💡 Инсайт: Baggage пробрасывается через AsyncLocal, работает в async-методах без передачи параметров
 
 ---
 
@@ -72,8 +87,8 @@
 
 ## ✅ Критерий приёмки модуля
 
-- [ ] Логи содержат `trace_id` и `span_id` автоматически через OTel
-- [ ] `CorrelationId` извлекается из `Activity.Current.TraceId` и логируется как отдельное поле
+- [x] Логи содержат `trace_id` и `span_id` автоматически через OTel
+- [x] `CorrelationId` извлекается из `Activity.Current.TraceId` и логируется как отдельное поле
 - [ ] Baggage устанавливается и доступен в асинхронных вызовах через `Baggage.Current`
 - [ ] Сквозной тест подтверждает, что контекст не теряется между методами
 - [ ] `module9/README.md` описывает работу с контекстом и пропагаторами
