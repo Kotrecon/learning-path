@@ -9,6 +9,7 @@ using OpenTelemetry.Exporter;
 using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
+using System.Diagnostics;
 
 var AppMeter = new System.Diagnostics.Metrics.Meter("EP.ConsoleStarter", "1.0.0");
 var ItemsProcessed = AppMeter.CreateCounter<long>("items.processed", description: "Number of items processed");
@@ -146,6 +147,9 @@ try
 
         // Записываем метрику
         ItemsProcessed.Add(1, new KeyValuePair<string, object?>("item.type", "report"));
+
+        var correlationId = Activity.Current?.TraceId.ToString() ?? Guid.NewGuid().ToString("N");
+        logger.LogInformation("Processing with CorrelationId={CorrelationId}", correlationId);
 
         await Task.Delay(100);
     }
