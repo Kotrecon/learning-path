@@ -150,7 +150,7 @@ try
         // Записываем метрику
         ItemsProcessed.Add(1, new KeyValuePair<string, object?>("item.type", "report"));
 
-        // вычлиняем корреляйшен
+        // извлекаем CorrelationId
         var correlationId = Activity.Current?.TraceId.ToString() ?? Guid.NewGuid().ToString("N");
         logger.LogInformation("Processing with CorrelationId={CorrelationId}", correlationId);
 
@@ -160,6 +160,8 @@ try
         var userId = Baggage.Current.GetBaggage("user.id");
         var tenantId = Baggage.Current.GetBaggage("tenant.id");
         logger.LogInformation("Baggage loaded: UserId={UserId}, TenantId={TenantId}", userId, tenantId);
+        // передаём контекст неявно через AsyncLocal
+        await ProcessAsync(logger);
 
         await Task.Delay(100);
     }
@@ -179,4 +181,11 @@ catch (Exception ex) when (ex is not OperationCanceledException)
     Console.Error.WriteLine($"📄 Crash report saved to: {logPath}");
 
     Environment.ExitCode = 1;
+}
+static async Task ProcessAsync(ILogger logger)
+{
+    var correlationId = Activity.Current?.TraceId.ToString() ?? "none";
+    var userId = Baggage.Current.GetBaggage("user.id") ?? "none";
+    logger.LogInformation("Inside ProcessAsync: CorrelationId={CorrelationId}, UserId={UserId}", correlationId, userId);
+    await Task.Delay(50);
 }
