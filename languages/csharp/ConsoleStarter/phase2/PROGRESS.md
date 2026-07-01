@@ -26,11 +26,11 @@
 
 ## Модуль 9 — 🔗 Correlation & Context Propagation
 
-- **Статус:** ⏳ Not Started
-- **PR:**
-- **Коммит:**
-- **Артефакты:** `src/ConsoleStarter/Services/PipelineWorker.cs` (CorrelationId), `Baggage` usage, `phase2/module9/README.md`
-- **Ключевые навыки:** TraceId/SpanId injection, CorrelationId, Baggage, Propagators
+- **Статус:** ✅ Completed
+- **PR:** (ожидается)
+- **Коммит:** `docs(module9.6): add module README and finalize progress tracker`
+- **Артефакты:** `src/ConsoleStarter/Program.cs` (OTel-логирование, CorrelationId, Baggage, Propagators), `phase2/module9/README.md`, `templates/W3C_TRACE_FORMAT.md`
+- **Ключевые навыки:** TraceId/SpanId injection, CorrelationId, Baggage, Propagators, W3C TraceContext
 
 ---
 

@@ -1,11 +1,15 @@
-﻿using ConsoleStarter;
+using System.Diagnostics;
+using ConsoleStarter;
 using ConsoleStarter.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using OpenTelemetry;
+using OpenTelemetry.Context.Propagation;
 using OpenTelemetry.Exporter;
+using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
 
@@ -21,7 +25,7 @@ var builder = Host.CreateApplicationBuilder(args);
 
 // ----------------------------------------------------------------------------
 // 1. КОНФИГУРАЦИЯ (должна быть готова ДО регистрации сервисов). Порядок: JSON 
-// → ENV → CLI (последний побеждает)
+// → ENV → CLI (последний побеждает) (убрать в финале, потому что CreateApplicationBuilder это сам делает)
 // ----------------------------------------------------------------------------
 builder.Configuration
     .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
@@ -47,21 +51,21 @@ builder.Services.AddSingleton<ConfigMonitorService>();
 builder.Services.AddHostedService<PipelineWorker>();
 
 // ----------------------------------------------------------------------------
-// 7. Модуль 7: Включить JSON-форматер
+// 7. Модуль 7: Логирование через OTel
 // ----------------------------------------------------------------------------
 
 builder.Logging.ClearProviders();
 
 builder.Logging.AddConsole();
 
-// builder.Logging.AddJsonConsole(options =>
-// {
-//     options.IncludeScopes = true;
-//     options.JsonWriterOptions = new System.Text.Json.JsonWriterOptions { Indented = false };
-// });
 // ----------------------------------------------------------------------------
 // 8. OTEl (подключение трейсов и метрик)
 // ----------------------------------------------------------------------------
+builder.Logging.AddOpenTelemetry(logging =>
+{
+    logging.AddConsoleExporter();
+});
+
 builder.Services.AddOpenTelemetry()
     .WithTracing(t =>
         {
@@ -85,8 +89,6 @@ builder.Services.AddOpenTelemetry()
             });
         });
 
-
-
 using var activitySource = new System.Diagnostics.ActivitySource("EP.ConsoleStarter", "1.0.0");
 
 // ----------------------------------------------------------------------------
@@ -100,15 +102,15 @@ var host = builder.Build();
 // ----------------------------------------------------------------------------
 
 // 5.1: IConfiguration (string-значения)
-Console.WriteLine("\n=== Config: IConfiguration ===");
-Console.WriteLine($"Name: {builder.Configuration["App:Name"]}");
-Console.WriteLine($"Timeout: {builder.Configuration["App:Timeout"]} (Type: string)");
+// Console.WriteLine("\n=== Config: IConfiguration ===");
+// Console.WriteLine($"Name: {builder.Configuration["App:Name"]}");
+// Console.WriteLine($"Timeout: {builder.Configuration["App:Timeout"]} (Type: string)");
 
-// 5.2: IOptions<T> (статичный снимок, автоматическое приведение типов)
+// // 5.2: IOptions<T> (статичный снимок, автоматическое приведение типов)
 var settings = host.Services.GetRequiredService<IOptions<AppSettings>>().Value;
-Console.WriteLine("\n=== Config: IOptions<T> ===");
-Console.WriteLine($"Name: {settings.Name} (Type: {settings.Name.GetType().Name})");
-Console.WriteLine($"Timeout: {settings.Timeout} (Type: {settings.Timeout.GetType().Name})");
+// Console.WriteLine("\n=== Config: IOptions<T> ===");
+// Console.WriteLine($"Name: {settings.Name} (Type: {settings.Name.GetType().Name})");
+// Console.WriteLine($"Timeout: {settings.Timeout} (Type: {settings.Timeout.GetType().Name})");
 
 // 5.3: IOptionsMonitor<T> (реактивный доступ)
 var monitorService = host.Services.GetRequiredService<ConfigMonitorService>();
@@ -119,16 +121,16 @@ var logger = host.Services.GetRequiredService<ILogger<Program>>();
 
 using var scope = logger.BeginScope(new { TransactionId = Guid.NewGuid().ToString("N") });
 
-logger.LogInformation("Step about scope: Starting");
-logger.LogInformation("Step about scope: Processing");
-logger.LogInformation("Step about scope: Completed");
+// logger.LogInformation("Step about scope: Starting");
+// logger.LogInformation("Step about scope: Processing");
+// logger.LogInformation("Step about scope: Completed");
 
-logger.LogInformation("User {UserId} from {Ip} accessed {Resource}", 123, "10.0.0.1", "/api/data");
+// logger.LogInformation("User {UserId} from {Ip} accessed {Resource}", 123, "10.0.0.1", "/api/data");
 
-logger.LogTrace("Trace message");
-logger.LogInformation("Information message");
-logger.LogWarning("Warning message");
-logger.LogError("Error message");
+// logger.LogTrace("Trace message");
+// logger.LogInformation("Information message");
+// logger.LogWarning("Warning message");
+// logger.LogError("Error message");
 
 // ----------------------------------------------------------------------------
 // 6. ЗАПУСК ХОСТА + ГЛОБАЛЬНАЯ ОБРАБОТКА ОШИБОК (Задача 6.3)
@@ -141,10 +143,40 @@ try
     using (var activity = activitySource.StartActivity("ProcessData"))
     {
         activity?.SetTag("item.count", 10);
-        activity?.SetTag("user.id", 123);
+
+        // проверяем логирование
+        logger.LogInformation("Processing started with item count {ItemCount}", 10);
+        logger.LogInformation("Processing completed");
 
         // Записываем метрику
         ItemsProcessed.Add(1, new KeyValuePair<string, object?>("item.type", "report"));
+
+        // извлекаем CorrelationId
+        var correlationId = Activity.Current?.TraceId.ToString() ?? Guid.NewGuid().ToString("N");
+        logger.LogInformation("Processing with CorrelationId={CorrelationId}", correlationId);
+
+        // создаем и извлекаем Baggage
+        Baggage.SetBaggage("user.id", "123");
+        Baggage.SetBaggage("tenant.id", "abc");
+        var userId = Baggage.Current.GetBaggage("user.id");
+        var tenantId = Baggage.Current.GetBaggage("tenant.id");
+        logger.LogInformation("Baggage loaded: UserId={UserId}, TenantId={TenantId}", userId, tenantId);
+        // передаём контекст неявно через AsyncLocal
+        await ProcessAsync(logger);
+
+        // Симуляция передачи контекста по сети
+        var carrier = new Dictionary<string, string>();
+        Propagators.DefaultTextMapPropagator.Inject(
+            new PropagationContext(Activity.Current!.Context, Baggage.Current),
+            carrier,
+            (dict, key, value) => dict[key] = value);
+        logger.LogInformation("Injected headers: {Headers}", string.Join(", ", carrier.Select(kv => $"{kv.Key}={kv.Value}")));
+        // Симуляция извлечения контекста
+        var extractedContext = Propagators.DefaultTextMapPropagator.Extract(
+            default,
+            carrier,
+            (dict, key) => dict.TryGetValue(key, out var value) ? new[] { value } : Enumerable.Empty<string>());
+        logger.LogInformation("Extracted TraceId: {TraceId}", extractedContext.ActivityContext.TraceId);
 
         await Task.Delay(100);
     }
@@ -164,4 +196,11 @@ catch (Exception ex) when (ex is not OperationCanceledException)
     Console.Error.WriteLine($"📄 Crash report saved to: {logPath}");
 
     Environment.ExitCode = 1;
+}
+static async Task ProcessAsync(ILogger logger)
+{
+    var correlationId = Activity.Current?.TraceId.ToString() ?? "none";
+    var userId = Baggage.Current.GetBaggage("user.id") ?? "none";
+    logger.LogInformation("Inside ProcessAsync: CorrelationId={CorrelationId}, UserId={UserId}", correlationId, userId);
+    await Task.Delay(50);
 }
