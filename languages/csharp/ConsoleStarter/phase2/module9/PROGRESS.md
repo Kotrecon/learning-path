@@ -69,12 +69,18 @@
 
 ## Секция 5: Propagators — сериализация контекста для сети
 
-### [ ] Задача 9.5: Исследовать механизмы пропагации контекста через границы процессов
+### [x] Задача 9.5: Исследовать механизмы пропагации контекста через границы процессов
 
-- **Статус:** ⏳
-- **Дата выполнения:**
-- **Коммит:**
+- **Статус:** ✅ Completed
+- **Дата выполнения:** 2026-07-01
+- **Коммит:** `chore(module9.5): explore manual context propagation via Propagators`
 - **Заметки/Наблюдения:**
+  - `Propagators.DefaultTextMapPropagator.Inject()` — записывает `traceparent` и `baggage` в словарь
+  - `Propagators.DefaultTextMapPropagator.Extract()` — читает заголовки и восстанавливает `ActivityContext`
+  - Формат `traceparent`: `00-{traceId}-{spanId}-{flags}`
+  - `PropagationContext` принимает `Activity.Current.Context`, а не `Activity`
+  - Геттер для `Extract` возвращает `IEnumerable<string>`, не `string`
+  - 💡 Инсайт: Propagators = sérializer/deserializer контекста для распределённой трассировки
 
 ---
 

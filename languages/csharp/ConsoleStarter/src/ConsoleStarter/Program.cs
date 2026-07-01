@@ -7,6 +7,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using OpenTelemetry;
+using OpenTelemetry.Context.Propagation;
 using OpenTelemetry.Exporter;
 using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
@@ -162,6 +163,20 @@ try
         logger.LogInformation("Baggage loaded: UserId={UserId}, TenantId={TenantId}", userId, tenantId);
         // передаём контекст неявно через AsyncLocal
         await ProcessAsync(logger);
+
+        // Симуляция передачи контекста по сети
+        var carrier = new Dictionary<string, string>();
+        Propagators.DefaultTextMapPropagator.Inject(
+            new PropagationContext(Activity.Current!.Context, Baggage.Current),
+            carrier,
+            (dict, key, value) => dict[key] = value);
+        logger.LogInformation("Injected headers: {Headers}", string.Join(", ", carrier.Select(kv => $"{kv.Key}={kv.Value}")));
+        // Симуляция извлечения контекста
+        var extractedContext = Propagators.DefaultTextMapPropagator.Extract(
+            default,
+            carrier,
+            (dict, key) => dict.TryGetValue(key, out var value) ? new[] { value } : Enumerable.Empty<string>());
+        logger.LogInformation("Extracted TraceId: {TraceId}", extractedContext.ActivityContext.TraceId);
 
         await Task.Delay(100);
     }
